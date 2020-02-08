@@ -9,6 +9,8 @@ const saveScore = (score) => localStorage.setItem(storage, score);
 
 const getPreviousScore = () => localStorage.getItem(storage);
 
+const playAgainButton = () => document.querySelector('.play');
+
 const first = (items) => {
     items = [...items];
 
@@ -39,6 +41,14 @@ const updateDirection = (event, currentDirection, isChanginDirection) => {
 }
 
 const bootGame = () => {
+    const button = playAgainButton();
+
+    button.addEventListener('click', (event) => {
+        button.classList.add('hidden');
+
+        startGame();
+    });
+
     startGame();
 }
 
@@ -70,13 +80,13 @@ const renderCircle = (id, x, y, fillColor, strokeCollor) => {
     context.stroke();
 }
 
-const renderGameBoard = () => renderRectanble('#snake-game', 0, 0, canvasSize, canvasSize, '#f7fafc', '#718096')
+const renderGameBoard = () => renderRectanble('#snake-game', 0, 0, canvasSize, canvasSize, '#f7fafc', '#718096');
 
 const renderBoundaries = ({left, top, right, bottom}) => {
     right = right - left;
     bottom = bottom - top;
 
-    renderRectanble('#snake-game', left, top, right, bottom, '#f7fafc', '#4a5568')
+    renderRectanble('#snake-game', left, top, right, bottom, 'transparent', '#4a5568')
 }
 
 const renderSnake = (snake) => {
@@ -235,8 +245,8 @@ const snakeHitSelf = (snake, currentDirection) => {
 }
 
 const areBoundariesReducible = (boundaries) => {
-    const hasHorizontalSpace = boundaries.left <= boundaries.right - boundaries.left;
-    const hasVerticalSpace = boundaries.top <= boundaries.bottom - boundaries.top;
+    const hasHorizontalSpace = boundaries.left < boundaries.right - boundaries.left;
+    const hasVerticalSpace = boundaries.top < boundaries.bottom - boundaries.top;
 
     return hasHorizontalSpace && hasVerticalSpace;
 }
@@ -255,6 +265,7 @@ const checkIfGameHasEnded = (game, {snake, boundaries, currentDirection, current
     if (gameHasEnded) {
         clearInterval(game);
         saveScore(currentScore);
+        playAgainButton().classList.remove('hidden'); 
     }
 }
 
