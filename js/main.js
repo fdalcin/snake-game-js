@@ -1,5 +1,7 @@
 const blockSize = 16;
 const canvasSize = 800;
+const directions = {38: 'UP', 40: 'DOWN', 37: 'LEFT', 39: 'RIGHT'};
+const oppositeDirections = {'DOWN': 'UP', 'LEFT': 'RIGHT', 'RIGHT': 'LEFT', 'UP': 'DOWN'};
 
 const first = (items) => {
     items = [...items];
@@ -11,6 +13,24 @@ const first = (items) => {
     return {...items[0]};
 }
 
+const updateDirection = (event, currentDirection, isChanginDirection) => {
+    const selectedDirection = directions[event.keyCode];
+    const opposite = oppositeDirections[currentDirection] === selectedDirection;
+
+    if (isChanginDirection) {
+        return [currentDirection, false];
+    }
+
+    if (! selectedDirection) {
+        return [currentDirection, false];
+    }
+
+    if (opposite) {
+        return [currentDirection, false];
+    }
+
+    return [selectedDirection, true];
+}
 
 const bootGame = () => {
     startGame();
@@ -69,11 +89,17 @@ const moveSnake = (snake, currentDirection) => {
 
 const startGame = () => {
     let currentDirection = 'LEFT';
+    let isChanginDirection = false;
     let snake = [{x: 400, y: 400},];
     let boundaries = {top: 0, right: canvasSize, bottom: canvasSize, left: 0};
 
+    document.addEventListener(
+        'keydown', 
+        (event) => [currentDirection, isChanginDirection] = updateDirection(event, currentDirection, isChanginDirection)
+    );
 
     let game = setInterval(() => {
+        isChanginDirection = false;
         renderGameBoard();
         snake = moveSnake(snake, currentDirection);
         renderBoundaries(boundaries);
