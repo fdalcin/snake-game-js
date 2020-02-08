@@ -1,8 +1,13 @@
+const storage = 'snake-game:previous-score';
 const blockSize = 16;
 const canvasSize = 800;
 const boundariesReductionSize = 113;
 const directions = {38: 'UP', 40: 'DOWN', 37: 'LEFT', 39: 'RIGHT'};
 const oppositeDirections = {'DOWN': 'UP', 'LEFT': 'RIGHT', 'RIGHT': 'LEFT', 'UP': 'DOWN'};
+
+const saveScore = (score) => localStorage.setItem(storage, score);
+
+const getPreviousScore = () => localStorage.getItem(storage);
 
 const first = (items) => {
     items = [...items];
@@ -88,8 +93,9 @@ const renderFood = (food) => {
 
 const renderScore = (score) => {
     const scoreBoard = document.querySelector('#current-score');
+    const scoreClass = score > getPreviousScore() ? 'gt-previous' : 'lt-previous';
 
-    scoreBoard.innerText = `Score: ${score}`;
+    scoreBoard.innerHTML = `<span class='${scoreClass}'>Score: ${score}</span>`;
 }
 
 const moveSnake = (snake, currentDirection) => {
@@ -143,7 +149,6 @@ const createFood = (food, boundaries, snake) => {
     if(isOnSnake(food, snake)) {
         food = null;
 
-        console.log('was in snake');
         return createFood(food, boundaries, snake);
     }
 
@@ -236,7 +241,7 @@ const areBoundariesReducible = (boundaries) => {
     return hasHorizontalSpace && hasVerticalSpace;
 }
 
-const checkIfGameHasEnded = (snake, boundaries, currentDirection, game) => {
+const checkIfGameHasEnded = (game, {snake, boundaries, currentDirection, currentScore}) => {
     let gameHasEnded = false;
 
     if (snakeHitSelf(snake, currentDirection)) {
@@ -249,6 +254,7 @@ const checkIfGameHasEnded = (snake, boundaries, currentDirection, game) => {
 
     if (gameHasEnded) {
         clearInterval(game);
+        saveScore(currentScore);
     }
 }
 
@@ -271,7 +277,7 @@ const startGame = () => {
         [snake, boundaries, currentDirection] = updateIfBoundaryWasHit(snake, boundaries, currentDirection);
         [snake, food, currentScore] = updateIfFoodWasEaten(snake, food, currentScore);
         food = updateIfFoodOutsideBoundaries(food, boundaries);
-        checkIfGameHasEnded(snake, boundaries, currentDirection, game);
+        checkIfGameHasEnded(game, {snake, boundaries, currentDirection, currentScore});
         food = createFood(food, boundaries, snake);
         snake = moveSnake(snake, currentDirection);
         renderBoundaries(boundaries);

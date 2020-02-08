@@ -18,3 +18,17 @@
     padding: 1rem 0;
     width: 800px;
 }
+
+.score span {
+    font-weight: 700;
+    font-size: 1rem;
+    font-family: Helvetica;
+}
+
+.score span.gt-previous {
+    color: #48bb78;
+}
+
+.score span.lt-previous {
+    color: #a0aec0;
+}
