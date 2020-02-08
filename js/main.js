@@ -85,6 +85,12 @@ const renderFood = (food) => {
     renderCircle('#snake-game', food.x, food.y, '#feB2B2', '#9b2c2c');
 }
 
+const renderScore = (score) => {
+    const scoreBoard = document.querySelector('#current-score');
+
+    scoreBoard.innerText = `Score: ${score}`;
+}
+
 const moveSnake = (snake, currentDirection) => {
     const snakeHead = first(snake);
     const snakeTail = [...snake];
@@ -145,8 +151,29 @@ const createFood = (food, boundaries, snake) => {
     return food;
 }
 
+const updateIfFoodWasEaten = (snake, food, score) => {
+    if (!food) {
+        return [snake, food, score];
+    }
+
+    if (!food.visible) {
+        return [snake, food, score];
+    }
+
+    const snakeHead = first(snake);
+
+    if (snakeHead.x === food.x && snakeHead.y === food.y) {
+        food = null;
+        score += 1;
+        snake = [snakeHead, ...snake]
+    }
+
+    return [snake, food, score];
+}
+
 const startGame = () => {
     let food;
+    let currentScore = 0;
     let currentDirection = 'LEFT';
     let isChanginDirection = false;
     let snake = [{x: 400, y: 400},];
@@ -160,11 +187,13 @@ const startGame = () => {
     let game = setInterval(() => {
         isChanginDirection = false;
         renderGameBoard();
+        [snake, food, currentScore] = updateIfFoodWasEaten(snake, food, currentScore);
         food = createFood(food, boundaries, snake);
         snake = moveSnake(snake, currentDirection);
         renderBoundaries(boundaries);
         renderFood(food);
         renderSnake(snake);
+        renderScore(currentScore);
     }, 100);
 }
 
