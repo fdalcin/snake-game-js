@@ -222,6 +222,36 @@ const updateIfFoodOutsideBoundaries = (food, boundaries) => {
     return food;
 }
 
+const snakeHitSelf = (snake, currentDirection) => {
+    const snakeHead = first(moveSnake(snake, currentDirection));
+    const snakeTail = [...snake].slice(1);
+
+    return snakeTail.some(segment => segment.x === snakeHead.x && segment.y === snakeHead.y);
+}
+
+const areBoundariesReducible = (boundaries) => {
+    const hasHorizontalSpace = boundaries.left <= boundaries.right - boundaries.left;
+    const hasVerticalSpace = boundaries.top <= boundaries.bottom - boundaries.top;
+
+    return hasHorizontalSpace && hasVerticalSpace;
+}
+
+const checkIfGameHasEnded = (snake, boundaries, currentDirection, game) => {
+    let gameHasEnded = false;
+
+    if (snakeHitSelf(snake, currentDirection)) {
+        gameHasEnded = true;
+    }
+
+    if (! areBoundariesReducible(boundaries)) {
+        gameHasEnded = true;
+    }
+
+    if (gameHasEnded) {
+        clearInterval(game);
+    }
+}
+
 const startGame = () => {
     let food;
     let currentScore = 0;
@@ -241,6 +271,7 @@ const startGame = () => {
         [snake, boundaries, currentDirection] = updateIfBoundaryWasHit(snake, boundaries, currentDirection);
         [snake, food, currentScore] = updateIfFoodWasEaten(snake, food, currentScore);
         food = updateIfFoodOutsideBoundaries(food, boundaries);
+        checkIfGameHasEnded(snake, boundaries, currentDirection, game);
         food = createFood(food, boundaries, snake);
         snake = moveSnake(snake, currentDirection);
         renderBoundaries(boundaries);
