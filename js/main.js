@@ -205,6 +205,23 @@ const updateIfBoundaryWasHit = (snake, boundaries, currentDirection) => {
     return [snake, boundaries, currentDirection];
 }
 
+const updateIfFoodOutsideBoundaries = (food, boundaries) => {
+    if (!food) {
+        return;
+    }
+
+    const outsideTop = food.y < removeBoundaryReductionPenalty(boundaries.top)
+    const outsideBottom = food.y > removeBoundaryReductionPenalty(boundaries.bottom);
+    const outsideLeft = food.x < removeBoundaryReductionPenalty(boundaries.left);
+    const outsideRight = food.x > removeBoundaryReductionPenalty(boundaries.right);
+
+    if (outsideTop || outsideBottom || outsideLeft || outsideRight) {
+        return null;
+    }
+
+    return food;
+}
+
 const startGame = () => {
     let food;
     let currentScore = 0;
@@ -223,6 +240,7 @@ const startGame = () => {
         renderGameBoard();
         [snake, boundaries, currentDirection] = updateIfBoundaryWasHit(snake, boundaries, currentDirection);
         [snake, food, currentScore] = updateIfFoodWasEaten(snake, food, currentScore);
+        food = updateIfFoodOutsideBoundaries(food, boundaries);
         food = createFood(food, boundaries, snake);
         snake = moveSnake(snake, currentDirection);
         renderBoundaries(boundaries);
