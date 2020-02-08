@@ -1,5 +1,6 @@
 const blockSize = 16;
 const canvasSize = 800;
+const boundariesReductionSize = 113;
 const directions = {38: 'UP', 40: 'DOWN', 37: 'LEFT', 39: 'RIGHT'};
 const oppositeDirections = {'DOWN': 'UP', 'LEFT': 'RIGHT', 'RIGHT': 'LEFT', 'UP': 'DOWN'};
 
@@ -171,6 +172,39 @@ const updateIfFoodWasEaten = (snake, food, score) => {
     return [snake, food, score];
 }
 
+const removeBoundaryReductionPenalty = (boundary) => boundary - (boundary % blockSize);
+
+const updateIfBoundaryWasHit = (snake, boundaries, currentDirection) => {
+    const snakeHead = first(moveSnake(snake, currentDirection));
+    let collisionDetected = false;
+
+    if (snakeHead.y < removeBoundaryReductionPenalty(boundaries.top)) {
+        boundaries.bottom -= boundariesReductionSize;
+        collisionDetected = true;
+    }
+
+    if (snakeHead.y > removeBoundaryReductionPenalty(boundaries.bottom)) {
+        boundaries.top += boundariesReductionSize;
+        collisionDetected = true;
+    }
+    if (snakeHead.x < removeBoundaryReductionPenalty(boundaries.left)) {
+        boundaries.right -= boundariesReductionSize;
+        collisionDetected = true;
+    }
+    if (snakeHead.x > removeBoundaryReductionPenalty(boundaries.right)) {
+        boundaries.left += boundariesReductionSize;
+        collisionDetected = true;
+    }
+
+    if (collisionDetected) {
+        currentDirection = oppositeDirections[currentDirection];
+
+        snake = snake.reverse();
+    }
+
+    return [snake, boundaries, currentDirection];
+}
+
 const startGame = () => {
     let food;
     let currentScore = 0;
@@ -187,6 +221,7 @@ const startGame = () => {
     let game = setInterval(() => {
         isChanginDirection = false;
         renderGameBoard();
+        [snake, boundaries, currentDirection] = updateIfBoundaryWasHit(snake, boundaries, currentDirection);
         [snake, food, currentScore] = updateIfFoodWasEaten(snake, food, currentScore);
         food = createFood(food, boundaries, snake);
         snake = moveSnake(snake, currentDirection);
