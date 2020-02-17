@@ -21,11 +21,11 @@ const first = (items) => {
     return {...items[0]};
 }
 
-const updateDirection = (event, currentDirection, isChanginDirection) => {
+const updateDirection = (event, currentDirection, isChangingDirection) => {
     const selectedDirection = directions[event.keyCode];
     const opposite = oppositeDirections[currentDirection] === selectedDirection;
 
-    if (isChanginDirection) {
+    if (isChangingDirection) {
         return [currentDirection, false];
     }
 
@@ -52,7 +52,7 @@ const bootGame = () => {
     startGame();
 }
 
-const renderRectanble = (id, x, y, width, height, fillColor, strokeCollor) => {
+const renderRectangle = (id, x, y, width, height, fillColor, strokeCollor) => {
     const canvas = document.querySelector(id);
     const context = canvas.getContext('2d');
 
@@ -80,17 +80,17 @@ const renderCircle = (id, x, y, fillColor, strokeCollor) => {
     context.stroke();
 }
 
-const renderGameBoard = () => renderRectanble('#snake-game', 0, 0, canvasSize, canvasSize, '#f7fafc', '#718096');
+const renderGameBoard = () => renderRectangle('#snake-game', 0, 0, canvasSize, canvasSize, '#f7fafc', '#718096');
 
 const renderBoundaries = ({left, top, right, bottom}) => {
     right = right - left;
     bottom = bottom - top;
 
-    renderRectanble('#snake-game', left, top, right, bottom, 'transparent', '#4a5568')
+    renderRectangle('#snake-game', left, top, right, bottom, 'transparent', '#4a5568')
 }
 
 const renderSnake = (snake) => {
-    snake.forEach((segment, index) => renderRectanble('#snake-game', segment.x, segment.y, blockSize, blockSize, '#4c51bf', '#a3bffa'));
+    snake.forEach((segment, index) => renderRectangle('#snake-game', segment.x, segment.y, blockSize, blockSize, '#4c51bf', '#a3bffa'));
 }
 
 const renderFood = (food) => {
@@ -273,17 +273,17 @@ const startGame = () => {
     let food;
     let currentScore = 0;
     let currentDirection = 'LEFT';
-    let isChanginDirection = false;
+    let isChangingDirection = false;
     let snake = [{x: 400, y: 400},];
     let boundaries = {top: 0, right: canvasSize, bottom: canvasSize, left: 0};
 
     document.addEventListener(
         'keydown', 
-        (event) => [currentDirection, isChanginDirection] = updateDirection(event, currentDirection, isChanginDirection)
+        (event) => [currentDirection, isChangingDirection] = updateDirection(event, currentDirection, isChangingDirection)
     );
 
     let game = setInterval(() => {
-        isChanginDirection = false;
+        isChangingDirection = false;
         renderGameBoard();
         [snake, boundaries, currentDirection] = updateIfBoundaryWasHit(snake, boundaries, currentDirection);
         [snake, food, currentScore] = updateIfFoodWasEaten(snake, food, currentScore);
